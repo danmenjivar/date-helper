@@ -1,9 +1,13 @@
 
 let weeks = [];
 let daysOfTheWeek = [];
+// MON TUE WED THU FRI SAT SUN
+//  1   2   3   4   5   6   7
+
+const date_list = ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo'];
 
 const month_list = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-    'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
+    'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 
 function calcZeroLastDay(week, day = -1) {
     if (day === -1) {
@@ -24,6 +28,18 @@ document.querySelector("#month").addEventListener("change", (event) => {
     getDate();
 });
 
+let checkboxes = document.querySelectorAll("input[type=checkbox][name=daysOfTheWeek]");
+checkboxes.forEach(function (checkbox) {
+    checkbox.addEventListener('change', function () {
+        daysOfTheWeek =
+            Array.from(checkboxes) // Convert checkboxes to an array to use filter and map.
+                .filter(i => i.checked) // Use Array.filter to remove unchecked checkboxes.
+                .map(i => i.value) // Use Array.map to extract only the checkbox values from the array of objects.
+
+        console.log(daysOfTheWeek)
+        getDate();
+    })
+});
 
 function setCurrentMonth() {
     let date = new Date();
@@ -48,7 +64,7 @@ function getDate() {
             endDate = calendar[week][6]
 
             if (endDate == 0) {
-                endDate = `${month_list[month]} ${calcZeroLastDay(calendar[week])}`
+                endDate = `${month_list[month % 12]} ${calcZeroLastDay(JSON.parse(JSON.stringify(calendar[week])))}`
             }
             else {
                 endDate = `${endDate}`
@@ -61,20 +77,25 @@ function getDate() {
 
         } else { // format inidivual days
 
-            // for day in daysOfTheWeek:
 
-            //     date = calendar[week][day - 1]
+            for (const day of daysOfTheWeek) {
+                date = calendar[week][day - 1]
 
-            // if date == 0:
-            //     date = f'{date_list[day-1]}, {month_list[month]} {calcZeroLastDay(calendar[week][:], day - 1)}'
-            // else:
-            // date = f'{date_list[day-1]}, {month_list[month - 1]} {date}'
+                if (date == 0) {
+                    date = `${date_list[day-1]}, ${month_list[month % 12]} ${calcZeroLastDay(JSON.parse(JSON.stringify(calendar[week])), day - 1)}`
+                }
+                else {
+                    date = `${date_list[day - 1]}, ${month_list[month - 1]} ${date}`
+                }
 
-            // dt = Week(week + 1, date)
-            // weeks.append(dt)
+                weeks.push(date)
+            }
         }
+
+
     }
     console.log(weeks);
+    document.querySelector("#calendar").innerHTML = weeks.join('<br>');
 }
 
 function monthCalendar(year, month) {
